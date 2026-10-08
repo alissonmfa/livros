@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Livros{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Livros</h1>
+        <a class="btn btn-primary" href="{{ path('livro_new') }}">Novo</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Editora</th>
+                <th>Edição</th>
+                <th>Ano</th>
+                <th>Valor</th>
+                <th>Autores</th>
+                <th>Assuntos</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for livro in livros %}
+                <tr>
+                    <td>{{ livro.titulo }}</td>
+                    <td>{{ livro.editora }}</td>
+                    <td>{{ livro.edicao }}</td>
+                    <td>{{ livro.anoPublicacao }}</td>
+                    <td>R$ {{ livro.valor|number_format(2, ',', '.') }}</td>
+                    <td>
+                        {% for autor in livro.autores %}
+                            {{ autor.nome }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td>
+                        {% for assunto in livro.assuntos %}
+                            {{ assunto.descricao }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </td>
+                    <td class="text-end text-nowrap">
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ path('livro_edit', {livro: livro.codl}) }}">Editar</a>
+                        <form class="d-inline" method="post" action="{{ path('livro_delete', {livro: livro.codl}) }}" onsubmit="return confirm('Excluir este livro?')">
+                            <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="8">Nenhum livro cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

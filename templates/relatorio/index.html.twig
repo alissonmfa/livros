@@ -1,0 +1,126 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Relatório{% endblock %}
+
+{% block body %}
+    <h1 class="h3 mb-4">Relatório de livros</h1>
+    <form method="get" action="{{ path('relatorio_index') }}">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label" for="titulo">Título</label>
+                <input class="form-control" id="titulo" name="titulo" maxlength="40" value="{{ titulo }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label" for="editora">Editora</label>
+                <input class="form-control" id="editora" name="editora" maxlength="40" value="{{ editora }}">
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label" for="anoPublicacao">Ano de publicação</label>
+                <input class="form-control" id="anoPublicacao" name="anoPublicacao" inputmode="numeric" maxlength="4" data-mascara="digitos" data-max="4" value="{{ ano }}">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                {% include '_busca_multipla.html.twig' with {
+                    nome: 'autores',
+                    rotulo: 'Autores',
+                    placeholder: 'Pesquisar autor',
+                    vazio: 'Selecione os autores',
+                    opcoes: autores,
+                    campoId: 'codAu',
+                    campoTexto: 'nome',
+                    selecionados: autorIds
+                } %}
+            </div>
+            <div class="col-md-6">
+                {% include '_busca_multipla.html.twig' with {
+                    nome: 'assuntos',
+                    rotulo: 'Assuntos',
+                    placeholder: 'Pesquisar assunto',
+                    vazio: 'Selecione os assuntos',
+                    opcoes: assuntos,
+                    campoId: 'codAs',
+                    campoTexto: 'descricao',
+                    selecionados: assuntoIds
+                } %}
+            </div>
+        </div>
+        <button class="btn btn-primary" name="buscar" value="1">Procurar</button>
+    </form>
+
+    {% if buscou %}
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Editora</th>
+                    <th>Edição</th>
+                    <th>Ano</th>
+                    <th>Valor</th>
+                    <th>Autores</th>
+                    <th>Assuntos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livro in livros %}
+                    <tr>
+                        <td>{{ livro.titulo }}</td>
+                        <td>{{ livro.editora }}</td>
+                        <td>{{ livro.edicao }}</td>
+                        <td>{{ livro.anoPublicacao }}</td>
+                        <td>R$ {{ livro.valor|number_format(2, ',', '.') }}</td>
+                        <td>
+                            {% for autor in livro.autores %}
+                                {{ autor.nome }}{% if not loop.last %}, {% endif %}
+                            {% else %}
+                                —
+                            {% endfor %}
+                        </td>
+                        <td>
+                            {% for assunto in livro.assuntos %}
+                                {{ assunto.descricao }}{% if not loop.last %}, {% endif %}
+                            {% else %}
+                                —
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7">Nenhum livro encontrado.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+    <script>
+        document.querySelectorAll('.busca-multipla').forEach((menu) => {
+            const botao = menu.querySelector('button');
+            const lista = menu.querySelector('.lista-opcoes');
+            const busca = menu.querySelector('input[type="search"]');
+            const aviso = menu.querySelector('.busca-vazia');
+            const atualizar = () => {
+                const nomes = [...lista.querySelectorAll('input:checked')].map((input) => input.nextElementSibling.textContent);
+                botao.textContent = nomes.length ? nomes.join(', ') : menu.dataset.vazio;
+            };
+            lista.addEventListener('change', atualizar);
+            atualizar();
+            busca.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            });
+            busca.addEventListener('input', () => {
+                const termo = busca.value.trim().toLowerCase();
+                let visiveis = 0;
+                lista.querySelectorAll('.form-check').forEach((item) => {
+                    const oculto = !item.textContent.toLowerCase().includes(termo);
+                    item.hidden = oculto;
+                    if (!oculto) {
+                        visiveis++;
+                    }
+                });
+                aviso.classList.toggle('d-none', visiveis > 0);
+            });
+        });
+    </script>
+{% endblock %}

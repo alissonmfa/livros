@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ livro.codl ? 'Editar livro' : 'Novo livro' }}{% endblock %}
+
+{% block body %}
+    <h1 class="h3 mb-3">{{ livro.codl ? 'Editar livro' : 'Novo livro' }}</h1>
+    {% for erro in erros %}
+        <div class="alert alert-danger">{{ erro }}</div>
+    {% endfor %}
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="titulo">Título</label>
+            <input class="form-control" id="titulo" name="titulo" maxlength="80" value="{{ titulo }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="editora">Editora</label>
+            <input class="form-control" id="editora" name="editora" maxlength="80" value="{{ editora }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="edicao">Edição</label>
+            <input class="form-control" id="edicao" name="edicao" maxlength="40" value="{{ edicao }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="anoPublicacao">Ano de publicação</label>
+            <input class="form-control" id="anoPublicacao" name="anoPublicacao" inputmode="numeric" maxlength="4" data-mascara="digitos" data-max="4" data-ate="{{ 'now'|date('Y') }}" value="{{ ano }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label" for="valor">Valor (R$)</label>
+            <input class="form-control" id="valor" name="valor" inputmode="numeric" data-mascara="reais" value="{{ valor }}" required>
+        </div>
+        {% include '_busca_multipla.html.twig' with {
+            nome: 'autores',
+            rotulo: 'Autores',
+            placeholder: 'Pesquisar autor',
+            vazio: 'Selecione os autores',
+            opcoes: autores,
+            campoId: 'codAu',
+            campoTexto: 'nome',
+            selecionados: autorIds
+        } %}
+        {% include '_busca_multipla.html.twig' with {
+            nome: 'assuntos',
+            rotulo: 'Assuntos',
+            placeholder: 'Pesquisar assunto',
+            vazio: 'Selecione os assuntos',
+            opcoes: assuntos,
+            campoId: 'codAs',
+            campoTexto: 'descricao',
+            selecionados: assuntoIds
+        } %}
+        <button class="btn btn-primary">Salvar</button>
+        <a class="btn btn-link" href="{{ path('livro_index') }}">Cancelar</a>
+    </form>
+    <script>
+        document.querySelectorAll('.busca-multipla').forEach((menu) => {
+            const botao = menu.querySelector('button');
+            const lista = menu.querySelector('.lista-opcoes');
+            const busca = menu.querySelector('input[type="search"]');
+            const aviso = menu.querySelector('.busca-vazia');
+            const atualizar = () => {
+                const nomes = [...lista.querySelectorAll('input:checked')].map((input) => input.nextElementSibling.textContent);
+                botao.textContent = nomes.length ? nomes.join(', ') : menu.dataset.vazio;
+            };
+            lista.addEventListener('change', atualizar);
+            atualizar();
+            busca.addEventListener('keydown', (event) => {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                }
+            });
+            busca.addEventListener('input', () => {
+                const termo = busca.value.trim().toLowerCase();
+                let visiveis = 0;
+                lista.querySelectorAll('.form-check').forEach((item) => {
+                    const oculto = !item.textContent.toLowerCase().includes(termo);
+                    item.hidden = oculto;
+                    if (!oculto) {
+                        visiveis++;
+                    }
+                });
+                aviso.classList.toggle('d-none', visiveis > 0);
+            });
+        });
+    </script>
+{% endblock %}

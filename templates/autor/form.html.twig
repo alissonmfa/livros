@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ autor.codAu ? 'Editar autor' : 'Novo autor' }}{% endblock %}
+
+{% block body %}
+    <h1 class="h3 mb-3">{{ autor.codAu ? 'Editar autor' : 'Novo autor' }}</h1>
+    {% for erro in erros %}
+        <div class="alert alert-danger">{{ erro }}</div>
+    {% endfor %}
+    <form method="post">
+        <div class="mb-3">
+            <label class="form-label" for="nome">Nome</label>
+            <input class="form-control" id="nome" name="nome" maxlength="40" value="{{ nome }}" required>
+        </div>
+        <button class="btn btn-primary">Salvar</button>
+        <a class="btn btn-link" href="{{ path('autor_index') }}">Cancelar</a>
+    </form>
+{% endblock %}

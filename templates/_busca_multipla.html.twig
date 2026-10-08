@@ -1,0 +1,20 @@
+<div class="mb-3 busca-multipla" data-vazio="{{ vazio }}">
+    <label class="form-label" for="{{ nome }}">{{ rotulo }}</label>
+    <div class="dropdown">
+        <button class="form-select text-start" type="button" id="{{ nome }}" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">{{ vazio }}</button>
+        <div class="dropdown-menu w-100 p-2">
+            <input class="form-control mb-2" type="search" placeholder="{{ placeholder }}" autocomplete="off">
+            <div class="overflow-auto lista-opcoes" style="max-height: 12rem">
+                {% for opcao in opcoes %}
+                    {% set id = attribute(opcao, campoId) %}
+                    {% set texto = attribute(opcao, campoTexto) %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="{{ nome }}[]" value="{{ id }}" id="{{ nome }}-{{ id }}"{% if id in selecionados %} checked{% endif %}>
+                        <label class="form-check-label" for="{{ nome }}-{{ id }}">{{ texto }}</label>
+                    </div>
+                {% endfor %}
+            </div>
+            <div class="text-muted d-none busca-vazia">Nenhum resultado</div>
+        </div>
+    </div>
+</div>

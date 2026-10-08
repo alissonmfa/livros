@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Assuntos{% endblock %}
+
+{% block body %}
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h3 mb-0">Assuntos</h1>
+        <a class="btn btn-primary" href="{{ path('assunto_new') }}">Novo</a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Descrição</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for assunto in assuntos %}
+                <tr>
+                    <td>{{ assunto.descricao }}</td>
+                    <td class="text-end">
+                        <a class="btn btn-sm btn-outline-secondary" href="{{ path('assunto_edit', {assunto: assunto.codAs}) }}">Editar</a>
+                        <form class="d-inline" method="post" action="{{ path('assunto_delete', {assunto: assunto.codAs}) }}" onsubmit="return confirm('Excluir este assunto?')">
+                            <button class="btn btn-sm btn-outline-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="2">Nenhum assunto cadastrado.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
